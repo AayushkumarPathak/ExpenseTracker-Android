@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "834911666890",
+    "firebase_url": "https://lpuunit1-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "lpuunit1",
+    "storage_bucket": "lpuunit1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:834911666890:android:38a42bc7922940a21c6a33",
+        "android_client_info": {
+          "package_name": "com.example.moneymaster"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3oKmpcVOnOsAZFc_CxFUc1b6cg633-Jo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

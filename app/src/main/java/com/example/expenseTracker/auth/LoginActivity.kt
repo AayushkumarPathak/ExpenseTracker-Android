@@ -2,6 +2,7 @@ package com.example.expenseTracker.auth
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
@@ -14,6 +15,8 @@ import com.bumptech.glide.Glide
 import com.example.expenseTracker.MainActivity
 import com.example.expenseTracker.R
 import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.auth.FirebaseAuth
+import kotlin.apply
 
 class LoginActivity : AppCompatActivity() {
 
@@ -22,6 +25,9 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var loginButton: Button
     private lateinit var signupPrompt: TextView
     private lateinit var logoImage: ImageView
+    private lateinit var auth: FirebaseAuth
+    private val KEY_IS_LOGGED_IN = "is_logged_in"
+    private  val PREF_NAME = "auth_prefs"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +39,8 @@ class LoginActivity : AppCompatActivity() {
         passwordInput = findViewById(R.id.passwordInput)
         loginButton = findViewById(R.id.loginButton)
         signupPrompt = findViewById(R.id.signupPrompt)
+
+        auth = FirebaseAuth.getInstance()
 
         // Load GIF dynamically
         Glide.with(this)
@@ -102,13 +110,28 @@ class LoginActivity : AppCompatActivity() {
     private fun performLogin() {
         val email = emailInput.text.toString().trim()
         val password = passwordInput.text.toString().trim()
+        val prefs = getPrefs(this)
 
-        if (AuthManager.loginUser(this, email, password)) {
-            Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-        } else {
-            Toast.makeText(this, "Invalid email or password", Toast.LENGTH_SHORT).show()
-        }
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener { job ->
+                if (job.isSuccessful) {
+                    Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
+
+                    prefs.edit().putBoolean(KEY_IS_LOGGED_IN, true).apply()
+
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
+                } else {
+                    Toast.makeText(this, "Something went wrong, Try again", Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Invalid email or password", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun getPrefs(context: Context): SharedPreferences {
+        return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
     }
 }

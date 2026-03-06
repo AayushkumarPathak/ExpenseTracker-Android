@@ -1,6 +1,8 @@
 package com.example.expenseTracker
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +22,8 @@ import com.google.android.material.button.MaterialButton
 class SettingsFragment : Fragment() {
 
     private lateinit var currencySpinner: Spinner
+    private  val PREF_NAME = "auth_prefs"
+    private  val KEY_IS_LOGGED_IN = "is_logged_in"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -124,14 +128,20 @@ class SettingsFragment : Fragment() {
     }
 
     private fun performLogout() {
-        AuthManager.logout(requireContext())
+        logout(requireContext())
         Toast.makeText(context, "Logged out successfully", Toast.LENGTH_SHORT).show()
-        
+
         // Navigate to login screen
         val intent = Intent(requireContext(), LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         requireActivity().finish()
+    }
+    private fun getPrefs(context: Context): SharedPreferences {
+        return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+    }
+    private fun logout(context: Context) {
+        getPrefs(context).edit().putBoolean(KEY_IS_LOGGED_IN, false).apply()
     }
 
     companion object {

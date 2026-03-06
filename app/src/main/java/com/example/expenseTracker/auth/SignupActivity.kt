@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide
 import com.example.expenseTracker.MainActivity
 import com.example.expenseTracker.R
 import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.auth.FirebaseAuth
 
 class SignupActivity : AppCompatActivity() {
 
@@ -24,6 +25,8 @@ class SignupActivity : AppCompatActivity() {
     private lateinit var signupButton: Button
     private lateinit var loginPrompt: TextView
     private lateinit var logoImage: ImageView
+
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +40,8 @@ class SignupActivity : AppCompatActivity() {
         confirmPasswordInput = findViewById(R.id.confirmPasswordInput)
         signupButton = findViewById(R.id.signupButton)
         loginPrompt = findViewById(R.id.loginPrompt)
+
+        auth = FirebaseAuth.getInstance()
 
         // Load GIF dynamically (same as login)
         Glide.with(this)
@@ -125,12 +130,21 @@ class SignupActivity : AppCompatActivity() {
         val email = emailInput.text.toString().trim()
         val password = passwordInput.text.toString().trim()
 
-        if (AuthManager.registerUser(this, email, password)) {
-            Toast.makeText(this, "Account created successfully!", Toast.LENGTH_SHORT).show()
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-        } else {
-            Toast.makeText(this, "Failed to create account", Toast.LENGTH_SHORT).show()
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { job ->
+
+                if(job.isSuccessful){
+                    Toast.makeText(this, "Account created successfully!", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
+                }
+                else{
+                    Toast.makeText(this, "Something went wrong,\nTry again", Toast.LENGTH_SHORT).show()
+                }
+
         }
+            .addOnFailureListener {
+                Toast.makeText(this, "Failed to create account", Toast.LENGTH_SHORT).show()
+            }
     }
 }
